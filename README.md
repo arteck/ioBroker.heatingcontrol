@@ -75,7 +75,7 @@ Features:
 * visualization from [Pittini](https://github.com/Pittini/iobroker-heatingcontrol-vis) is supported. Thank you!
 * Vis-2 support with [vis-2-widgets-weather-and-heating](https://github.com/rg-engineering/ioBroker.vis-2-widgets-weather-and-heating)
 
-[FAQ](doc/FAQ.md)
+[FAQ](doc/en/FAQ.md)
 
 
 ## Installation
@@ -128,8 +128,7 @@ Features:
 | PartyNow            | decrease temperature because it's becoming hot'            | decrease current profile temperature by Profiles.0.room.relative.PartyDecrease          | set target to Profiles.0.room.absolute.PartyDecrease          | 
 | Present             | we are present, if we are not present decrease temperature | decrease current profile temperature by Profiles.0.room.relative.AbsentDecrease         | set target to Profiles.0.room.absolute.AbsentDecrease         | 
 | VacationAbsent	  | we are absent, so decrease also on weekend                 | decrease current profile temperature by Profiles.0.room.relative.VacationAbsentDecrease | set target to Profiles.0.room.absolute.VacationAbsentDecrease | 
-| FireplaceModeActive | decrease temperature bacause you use a fireplace, will be  | decrease current profile temperature by Profiles.0.room.relative.FireplaceModeDecrease  | set target to Profiles.0.room.absolute.FireplaceModeDecrease  | 
-|                     | reseted automatically at adjustable time
+| FireplaceModeActive | decrease temperature bacause you use a fireplace, will be reseted automatically at adjustable time | decrease current profile temperature by Profiles.0.room.relative.FireplaceModeDecrease  | set target to Profiles.0.room.absolute.FireplaceModeDecrease  | 
 
 
 * Datapoints only available if "General Profile Settings, temperature lowering" is set
@@ -289,15 +288,17 @@ When the adapter crashes or an other Code error happens, this error message that
   Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 --->
-### **WORK IN PROGRESS**
-- (arteck) add TemperatureIfNoHeatingPeriod to Pittini Script
-- (arteck) redesign Settings
-- (arteck) add descaling trip
+### 3.3.1 (2026-09-12)
+* (René) dependencies updated
+* (GermanBluefox) readme updated
+* (arteck) add TemperatureIfNoHeatingPeriod to Pittini Script
+* (arteck) redesign Settings
+* (arteck) add descaling trip
 
 ### 3.2.0 (2026-06-03)
-- (copilot) Adapter requires node.js >= 22 now
-- (René) see issue #810: HeatingPeriod configurable via datapoint (like in admin) as option
-- (René) dependencies updated
+* (copilot) Adapter requires node.js >= 22 now
+* (René) see issue #810: HeatingPeriod configurable via datapoint (like in admin) as option
+* (René) dependencies updated
 
 ### 3.1.4 (2026-04-26)
 * (Eistee82 + Claude Opus 4.6) fix visualization step width: selecting 0.5°C stored 1.5 instead of 0.5 (#785)
@@ -327,10 +328,6 @@ When the adapter crashes or an other Code error happens, this error message that
 * (René) some logs in migrate data
 * (René) issue #781: fix upload configuration
 
-### 3.1.0 (2026-03-16)
-* (softwarecrash) Add optional window-open thermostat priority
-* (René) changes requested by adapter checker
-* (René) dependencies updated
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
