@@ -9,11 +9,15 @@ Hat man aber Geräte von unterschiedlichen Herstellern funktioniert das meist ni
 nicht verändern (schreiben).
 Deshalb gibt es im Adapter die Möglichkeit, die Solltemperatur basierend auf der Differenz zwischen Thermostat-internem Sensor und einem beliebigen externen
 Temperatursensor zu korrigieren. 
-Der Adapter ermittelt regelmässig die Differenz zwischen den beiden Sensoren und bildet einen gleitenden Mittelwert der Differenz. Dieser Mittelwert
+Der Adapter berechnet die Differenz zwischen den beiden Sensoren ausschliesslich bei einer Wertänderung des externen Sensors (es gibt kein festes Intervall). Aus den Messwerten wird ein Mittelwert der Differenz gebildet. Dieser Mittelwert
 wird als 
 heatingcontrol.0.Rooms.Raum.TemperatureOffset
 pro Raum gespeichert. Bei jedem Setzen der Solltemperatur wird dieser Temperatur-Offset der eigentlichen Solltemperatur hinzu addiert.
 Achtung: der Mittelwert kann sich ändern, aber er wird nur auf die Zieltemperatur addiert, wenn die Zieltemperatur nach Plan geändert wird (Profilpunkt, Fenster auf ,...)
+
+Ab drei vorliegenden Messwerten wird der Offset als echter Mittelwert der Messreihe gebildet und auf 0,5 °C gerundet.
+Bei weniger als drei Messwerten dient der bisherige Offset als Startwert.
+Eine dauerhafte Differenz von weniger als etwa 0,6 °C kann je nach Messreihe zu einem gerundeten Offset von 0 führen.
 
 Bei Verwendung von mehr als einem Sensor wird ein Mittelwert über alle Sensoren gebildet.
 

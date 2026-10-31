@@ -44,6 +44,23 @@ type Props = {
     addButtonTooltip?: string;
 };
 
+// Wandelt den TextField-Text in einen typkorrekten Wert um:
+// 'true'/'false' (case-insensitiv) -> boolean, numerisch -> number, sonst string
+const parseSensorValue = (raw: string): number | string | boolean => {
+    const trimmed = raw.trim();
+    const lower = trimmed.toLowerCase();
+    if (lower === 'true') {
+        return true;
+    }
+    if (lower === 'false') {
+        return false;
+    }
+    if (trimmed !== '' && !Number.isNaN(Number(trimmed))) {
+        return Number(trimmed);
+    }
+    return raw;
+};
+
 export default function SettingWindowSensorsTable(props: Props): React.JSX.Element {
     const { settingName, settings, onAdd, onUpdate, onRemove, addButtonTooltip } = props;
 
@@ -131,7 +148,7 @@ export default function SettingWindowSensorsTable(props: Props): React.JSX.Eleme
                                 <TextField
                                     fullWidth
                                     value={t.valueOpen}
-                                    onChange={(e) => onUpdate(idx, 'valueOpen', e.target.value)}
+                                    onChange={(e) => onUpdate(idx, 'valueOpen', parseSensorValue(e.target.value))}
                                     variant="standard"
                                     placeholder="true"
                                 />
@@ -141,7 +158,7 @@ export default function SettingWindowSensorsTable(props: Props): React.JSX.Eleme
                                 <TextField
                                     fullWidth
                                     value={t.valueClosed}
-                                    onChange={(e) => onUpdate(idx, 'valueClosed', e.target.value)}
+                                    onChange={(e) => onUpdate(idx, 'valueClosed', parseSensorValue(e.target.value))}
                                     variant="standard"
                                     placeholder="false"
                                 />

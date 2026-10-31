@@ -8,6 +8,9 @@ export interface RoomConfig {
     WindowSensors: SensorConfig[];
     Thermostats: ThermostatConfig[];
     AdditionalTemperatureSensors: SensorConfig[];
+    //Zeit in Sekunden, die auf die Temperaturmeldung des Thermostats gewartet wird,
+    //wenn das Thermostat selbst 'Fenster offen' verarbeitet (0-1000, optional wegen Bestandsinstallationen)
+    WaitForTempIfWindowOpen?: number;
 }
 
 export interface powerInterruptions {

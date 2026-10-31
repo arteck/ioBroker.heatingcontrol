@@ -140,21 +140,27 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
     // Lokaler State für zusätzliche Temperatursensoren des aktuell ausgewählten Raums
     const [AdditionalSensors, setAdditionalSensors] = useState<SettingTempSensorItem[]>([]);
 
-    // Neuer lokaler State für das TextField "WaitForTempIfWindowOpen"
-    // Erlaubt leeren String (für ungesetzten Wert) oder eine ganze Zahl 0-100
-    const [waitForTempIfWindowOpen, setWaitForTempIfWindowOpen] = useState<number | ''>(() => {
-        const v = (props.native as any).WaitForTempIfWindowOpen;
+    // Helper: liest WaitForTempIfWindowOpen aus der Raumkonfiguration und normalisiert auf 0-1000
+    const getWaitForTempFromRoom = (roomCfg?: RoomConfig): number | '' => {
+        const v = roomCfg?.WaitForTempIfWindowOpen;
         if (typeof v === 'number' && Number.isInteger(v)) {
-            return Math.max(0, Math.min(100, v));
+            return Math.max(0, Math.min(1000, v));
         }
         if (typeof v === 'string' && v !== '') {
             const n = parseInt(v, 10);
             if (!isNaN(n)) {
-                return Math.max(0, Math.min(100, n));
+                return Math.max(0, Math.min(1000, n));
             }
         }
         return '';
-    });
+    };
+
+    // Neuer lokaler State für das TextField "WaitForTempIfWindowOpen"
+    // Erlaubt leeren String (für ungesetzten Wert) oder eine ganze Zahl 0-1000
+    // Wert wird pro Raum aus props.native.rooms[room].WaitForTempIfWindowOpen gelesen
+    const [waitForTempIfWindowOpen, setWaitForTempIfWindowOpen] = useState<number | ''>(() =>
+        getWaitForTempFromRoom(findRoom((props.native as any).roomSelector ?? ''))
+    );
 
     // Neuer lokaler State für Ergebnis / Status von Check4NewThermostats
     const [checkThermostatsResult, setCheckThermostatsResult] = useState<string>('');
@@ -243,6 +249,7 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
             setWindowSensors([]);
             setAdditionalSensors([]);
             setRoomIsActive(false);
+            setWaitForTempIfWindowOpen('');
             return;
         }
         const roomCfg = findRoom(selectedRoom);
@@ -253,10 +260,14 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
             setWindowSensors([]);
             setAdditionalSensors([]);
             setRoomIsActive(false);
+            setWaitForTempIfWindowOpen('');
             return;
         }
         // isActive für aktuellen Raum laden
         setRoomIsActive(!!roomCfg.isActive);
+
+        // WaitForTempIfWindowOpen des aktuellen Raums laden
+        setWaitForTempIfWindowOpen(getWaitForTempFromRoom(roomCfg));
 
         const list1: SettingThermostatItem[] = Array.isArray(roomCfg?.Thermostats)
             ? roomCfg.Thermostats.map((t: any) => ({
@@ -286,8 +297,8 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
                 isActive: !!t?.isActive,
                 OID_Current: t?.OID_Current ?? '',
                 DataType: t?.DataType ?? 'boolean',
-                valueOpen: t?.valueOpen ?? 'true',
-                valueClosed: t?.valueClosed ?? 'false',
+                valueOpen: t?.valueOpen ?? true,
+                valueClosed: t?.valueClosed ?? false,
             }))
             : [];
         setWindowSensors(list3);
@@ -450,7 +461,7 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
         persistAdditionalSensors(newList);
     };
 
-    // Handler für das neue TextField: nur ganze Zahlen 0-100 erlauben
+    // Handler für das neue TextField: nur ganze Zahlen 0-1000 erlauben (0 = sofort)
     const handleWaitChange = (e: React.ChangeEvent<HTMLInputElement>):void => {
         // Nur Ziffern zulassen
         const digits = e.target.value.replace(/\D+/g, '');
@@ -482,8 +493,11 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
             val = 1000;
         }
         setWaitForTempIfWindowOpen(val);
-        const newNative = { ...(props.native as any), WaitForTempIfWindowOpen: val };
-        props.changeNative(newNative);
+        // Persistierung pro Raum (native.rooms[room].WaitForTempIfWindowOpen),
+        // nicht auf der native-Wurzel
+        if (selectedRoom) {
+            setRoomFields(selectedRoom, { WaitForTempIfWindowOpen: val });
+        }
     };
 
     const Check4NewThermostats = async (): Promise<void> => {
@@ -724,12 +738,17 @@ export default function RoomSettings(props: SettingsProps): React.JSX.Element {
                 if (toAddMap.has(key)) {
                     return;
                 }
+                // DataType/valueOpen/valueClosed explizit setzen: die Adapter-Antwort von
+                // 'listSensors' (lib/devicedetect.js -> Check4Sensor) liefert nur Name und OID_Current.
+                // Defaults entsprechen lib/database.js (GetSensorsId4Room): boolean / true / false
                 const item: SettingWindowSensorItem = {
                     name: d?.Name ?? '',
                     isActive: true,
                     OID_Current: oidCurrent ?? '',
-
-                } as SettingWindowSensorItem;
+                    DataType: 'boolean',
+                    valueOpen: true,
+                    valueClosed: false,
+                };
                 toAddMap.set(key, item);
             });
 

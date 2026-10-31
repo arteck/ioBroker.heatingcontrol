@@ -929,9 +929,30 @@ async function checkHeatingPeriod() {
             
             let isHeatingPeriod = false;
 
-            if (adapter.config.FixHeatingPeriodStart.length > 0 && adapter.config.FixHeatingPeriodEnd.length > 0) {
-                const StartPeriod = adapter.config.FixHeatingPeriodStart.split(/[.,/ -]/);
-                const EndPeriod = adapter.config.FixHeatingPeriodEnd.split(/[.,/ -]/);
+            // if heating period is maintained as datapoints, prefer them over config values
+            let HeatingPeriodStartRaw = adapter.config.FixHeatingPeriodStart;
+            let HeatingPeriodEndRaw = adapter.config.FixHeatingPeriodEnd;
+
+            if (adapter.config.HeatingPeriodAsDP === true) {
+                try {
+                    const startState = await adapter.getStateAsync("FixHeatingPeriodStart");
+                    if (startState && startState.val !== null && startState.val !== undefined && String(startState.val).trim().length > 0) {
+                        HeatingPeriodStartRaw = String(startState.val);
+                        adapter.log.debug("using FixHeatingPeriodStart from datapoint instead of config: " + HeatingPeriodStartRaw);
+                    }
+                    const endState = await adapter.getStateAsync("FixHeatingPeriodEnd");
+                    if (endState && endState.val !== null && endState.val !== undefined && String(endState.val).trim().length > 0) {
+                        HeatingPeriodEndRaw = String(endState.val);
+                        adapter.log.debug("using FixHeatingPeriodEnd from datapoint instead of config: " + HeatingPeriodEndRaw);
+                    }
+                } catch (e) {
+                    adapter.log.warn("could not read heating period from datapoints, using config values [" + e + "]");
+                }
+            }
+
+            if (HeatingPeriodStartRaw && HeatingPeriodEndRaw && HeatingPeriodStartRaw.length > 0 && HeatingPeriodEndRaw.length > 0) {
+                const StartPeriod = HeatingPeriodStartRaw.split(/[.,/ -]/);
+                const EndPeriod = HeatingPeriodEndRaw.split(/[.,/ -]/);
 
 
                 if (StartPeriod.length >= 2 && EndPeriod.length >= 2) {

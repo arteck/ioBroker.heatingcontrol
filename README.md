@@ -207,7 +207,7 @@ target temperature by itslef when a window is opened.
 In combination with option "use of changes from thermostat"  / "until next profil point" will lead this to an unexpected manual state. In this situation the reduced 
 temperature  would be used until next profil point.
 But the adpater can handle this behavior. You must enable option "Thermostat handles 'Window is Open'" and you can configure window sensors also in adapter.
-When window is opened the adapter waits for max. 3 seconds for new target temperature from thermostat. If it receives a new target temperature in that time it will be used
+When window is opened the adapter waits for max. 10 seconds for new target temperature from thermostat. If it receives a new target temperature in that time it will be used
 as a reduced absolut temperature. Status will then be "auto window open". As soon as the window is closed the status goes back to auto and thermostat sets back the
 original target temperature
 **Attention** do not use Sensor Open Delay in that case. If you use it, the Window open event appears after target temperature received from thermostat. This ends up in 
@@ -288,6 +288,14 @@ When the adapter crashes or an other Code error happens, this error message that
   Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 --->
+
+### **WORK IN PROGRESS**
+* (copilot) fix window sensors evaluated with inverted logic when valueClosed/valueOpen are stored as strings; valueOpen is now evaluated as well
+* (copilot) fix temperature offset dead zone: offset is now the real average of the measurement buffer once three values are available, so a constant deviation below ~0.6 °C is no longer rounded away to 0
+* (copilot) fix WaitForTempIfWindowOpen having no effect: the value is now stored per room instead of on the native root, so the configured waiting time is actually used
+* (copilot) fix HeatingPeriodAsDP: the heating period from the datapoints is now also used in checkHeatingPeriod at adapter start; added missing native defaults for HeatingPeriodAsDP and AddTempSensorsUseEveryOffsetChange
+* (copilot) add 22 missing translations in all 11 admin languages (e.g. HeatingPeriodAsDP) and complete window sensor auto-detection defaults (DataType/valueOpen/valueClosed)
+
 ### 3.3.1 (2026-09-12)
 * (René) dependencies updated
 * (GermanBluefox) readme updated

@@ -9,11 +9,15 @@ But if you have devices from different manufacturers, this usually doesn't work.
 do not change (write).
 The adapter therefore offers the option of setting the target temperature based on the difference between the thermostat's internal sensor and any external sensor
 Correct temperature sensor.
-The adapter regularly determines the difference between the two sensors and forms a moving average of the difference. This mean
+The adapter determines the difference between the two sensors exclusively when the value of the external sensor changes (there is no fixed interval). From these readings an average of the difference is formed. This mean
 is called
 heatingcontrol.0.Rooms.Raum.TemperatureOffset
 saved per room. Each time the target temperature is set, this temperature offset is added to the actual target temperature.
 Attention: the mean value can change, but it is only added to the target temperature if the target temperature is changed according to the plan (profile point, window open, ...)
+
+With three or more readings the offset is calculated as the real average of the measurement series and rounded to 0.5 °C.
+With fewer than three readings the previous offset is used as the starting value.
+A permanent difference of less than about 0.6 °C can lead to a rounded offset of 0, depending on the measurement series.
 
 If more than one sensor is used, an average value is formed over all sensors. 
 
